@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwilioMediaStreams", "TwilioMediaStreams\TwilioMediaStreams.csproj", "{7C76A20F-2C50-400E-995D-07A8FE6D15F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsocketManager", "WebsocketManager\WebsocketManager.csproj", "{AB3CFE92-BE3D-4787-B379-201421738C27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C76A20F-2C50-400E-995D-07A8FE6D15F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C76A20F-2C50-400E-995D-07A8FE6D15F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C76A20F-2C50-400E-995D-07A8FE6D15F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C76A20F-2C50-400E-995D-07A8FE6D15F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3CFE92-BE3D-4787-B379-201421738C27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3CFE92-BE3D-4787-B379-201421738C27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3CFE92-BE3D-4787-B379-201421738C27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3CFE92-BE3D-4787-B379-201421738C27}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {240E48D8-3654-4A98-A608-682DF1BD7705}
+	EndGlobalSection
+EndGlobal
