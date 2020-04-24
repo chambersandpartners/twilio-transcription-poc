@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
-using Microsoft.Extensions.Options;
 using TwilioMediaStreams.Models;
 
 namespace TwilioMediaStreams.Services
@@ -26,7 +25,6 @@ namespace TwilioMediaStreams.Services
         {
             var config = SpeechConfig.FromSubscription(_projectSettings.AzureSpeechServiceSubscriptionKey, _projectSettings.AzureSpeechServiceRegionName);
             
-            // using MULAW as Twilio uses this format
             var audioFormat = AudioStreamFormat.GetCompressedFormat(AudioStreamContainerFormat.MULAW);
 
             _inputStream = AudioInputStream.CreatePushStream(audioFormat);
@@ -52,8 +50,8 @@ namespace TwilioMediaStreams.Services
 
             if (cancellation.Reason == CancellationReason.Error)
             {
-                Console.WriteLine($"CANCELED: ErrorDetails={cancellation.ErrorDetails}");
-                Console.WriteLine($"CANCELED: Did you update the subscription info?");
+                Debug.WriteLine($"CANCELED: ErrorDetails={cancellation.ErrorDetails}");
+                Debug.WriteLine($"CANCELED: Did you update the subscription info?");
             }
         }
 
@@ -64,6 +62,7 @@ namespace TwilioMediaStreams.Services
 
         private void RecognizerRecognized(object sender, SpeechRecognitionEventArgs e)
         {
+            // Will eventually push to users screen via SignalR
             Debug.WriteLine($"{e.SessionId} > Final result: {e.Result.Text}");
         }
 

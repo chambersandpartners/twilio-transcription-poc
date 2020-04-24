@@ -31,7 +31,7 @@ namespace TwilioMediaStreams.Controllers
             response.Append(say);
             response.Pause(length: 60);
 
-            // TODO: Dial outgoing number
+            // TODO: Dial outgoing number to replace Say above
             //var dial = new Dial(number: "+44");
             //response.Append(dial);
 
