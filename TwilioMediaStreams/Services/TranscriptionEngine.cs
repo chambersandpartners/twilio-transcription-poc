@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -15,17 +17,21 @@ namespace TwilioMediaStreams.Services
         private PushAudioInputStream _inputStream;
         private AudioConfig _audioInput;
 
+        public int counter { get; set; }
+        private Dictionary<string, List<byte[]>> _dictionaryTempByteList = new Dictionary<string, List<byte[]>>();
+
         public TranscriptionEngine(string socketId, ProjectSettings projectSettings)
         {
             _projectSettings = projectSettings;
             _socketId = socketId;
+            _dictionaryTempByteList.Add(socketId, new List<byte[]>());
         }
 
         public async Task Start()
         {
             var config = SpeechConfig.FromSubscription(_projectSettings.AzureSpeechServiceSubscriptionKey, _projectSettings.AzureSpeechServiceRegionName);
-            
-            var audioFormat = AudioStreamFormat.GetCompressedFormat(AudioStreamContainerFormat.MULAW);
+
+            var audioFormat = AudioStreamFormat.GetWaveFormatPCM(8000, 16, 1);
 
             _inputStream = AudioInputStream.CreatePushStream(audioFormat);
             _audioInput = AudioConfig.FromStreamInput(_inputStream);
@@ -40,7 +46,18 @@ namespace TwilioMediaStreams.Services
 
         public async Task Transcribe(byte[] audioBytes)
         {
-            _inputStream.Write(audioBytes);
+            _dictionaryTempByteList[_socketId].Add(audioBytes);
+
+            if (counter % 20 == 0)
+            {
+                byte[] completeAudioBuffer = CreateAudioByteArray(_dictionaryTempByteList);
+
+                _inputStream.Write(completeAudioBuffer);
+
+                _dictionaryTempByteList[_socketId].Clear();
+            }
+
+            counter++;
         }
 
         private void RecognizerCancelled(object sender, SpeechRecognitionCanceledEventArgs e)
@@ -82,6 +99,27 @@ namespace TwilioMediaStreams.Services
             _inputStream.Dispose();
             _audioInput.Dispose();
             _recognizer?.Dispose();
+        }
+
+        private byte[] CreateAudioByteArray(Dictionary<string, List<byte[]>> dictionaryByteList)
+        {
+            //get the relevant dictionary entry
+            List<byte[]> byteList = dictionaryByteList[_socketId];
+
+            //create new byte array that will represent the "flattened" array
+            List<byte> completeAudioByteArray = new List<byte>();
+
+            foreach (byte[] byteArray in byteList)
+            {
+                foreach (byte singleByte in byteArray)
+                {
+                    completeAudioByteArray.Add(singleByte);
+                }
+            }
+
+            //collate the List<T> of byte arrays into a single large byte array
+            byte[] buffer = completeAudioByteArray.ToArray();
+            return buffer;
         }
     }
 }

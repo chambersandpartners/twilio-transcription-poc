@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using g711audio;
 using Microsoft.Extensions.Options;
 
 using WebSocketManager;
@@ -17,7 +18,7 @@ namespace TwilioMediaStreams.Services
         private readonly ProjectSettings _projectSettings;
 
         private Dictionary<string, TranscriptionEngine> _transcriptionEngines = new Dictionary<string, TranscriptionEngine>();
-
+      
         public MediaStreamHandler(WebSocketConnectionManager webSocketConnectionManager, IOptions<ProjectSettings> projectSettings) : base(webSocketConnectionManager)
         {
             _projectSettings = projectSettings.Value;
@@ -47,6 +48,8 @@ namespace TwilioMediaStreams.Services
                         break;
                     case "media":
                         string payload = jsonDocument.RootElement.GetProperty("media").GetProperty("payload").GetString();
+                        //string sequenceNumber = jsonDocument.RootElement.GetProperty("media").GetProperty("chunk").GetString();
+                        //await WritePayloadToDisk(sequenceNumber, payload);
                         await ProcessAudioForTranscriptionAsync(socketId, payload);
                         break;
                     case "stop":
@@ -54,6 +57,12 @@ namespace TwilioMediaStreams.Services
                         break;
                 }
             }
+        }
+
+        private async Task WritePayloadToDisk(string sequenceNumber, string payload)
+        {
+            var path = $"TwilioOutput/{sequenceNumber}.txt";
+            await File.WriteAllTextAsync(path, payload);
         }
 
         private void AddSocketTranscriptionEngine(string socketId)
@@ -71,9 +80,12 @@ namespace TwilioMediaStreams.Services
         private async Task ProcessAudioForTranscriptionAsync(string socketId, string payload)
         {
             byte[] payloadByteArray = Convert.FromBase64String(payload);
+            byte[] decoded;
 
+            MuLawDecoder.MuLawDecode(payloadByteArray, out decoded);
             var transcriptionEngine = GetSocketTranscriptionEngine(socketId);
-            await transcriptionEngine.Transcribe(payloadByteArray);
+            await transcriptionEngine.Transcribe(decoded);
+
         }
 
         private async Task OnConnectionFinishedAsync(WebSocket socket, string socketId)
